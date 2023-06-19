@@ -1,7 +1,7 @@
 #! /bin/sh
 
 apt update
-apt install strongswan strongswan-pki libstrongswan-extra-plugins libtss2-tcti-tabrmd0 libcharon-extra-plugins
+apt install -y strongswan strongswan-pki libstrongswan-extra-plugins libtss2-tcti-tabrmd0 libcharon-extra-plugins
 
 USERNAME=$(hostname)
 
