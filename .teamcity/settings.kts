@@ -70,6 +70,7 @@ project {
 
     val deployBuild = TerraformDeployBuild(
         dockerImage = terraformDockerImage,
+        dockerImageTag = dockerImageTag,
         agent = agent,
         scriptPath = pathToScripts,
         projectName = projectName,

@@ -1,0 +1,8 @@
+# Generate requirements with following command:
+# pip-compile --upgrade --resolver=backtracking --no-emit-index-url --output-file=requirements-ci.txt requirements.in
+# TODO: merge this azure shared and use clean tag
+mdl-azure-shared==1.2.2.dev4+g915cd65
+azure-mgmt-containerregistry~=10.0
+azure-mgmt-resource==23.0.1
+azure-storage-blob~=12.15
+returns
