@@ -61,6 +61,10 @@ class TerraformDeployBuild(
                 username=${'$'}(echo ${'$'}credential | jq -r '.username')
                 echo ${'$'}credential | jq -r '.passwords[] | select(.name == "password") | .value' | docker login ${'$'}ACR_URL --username ${'$'}username --password-stdin
             """.trimIndent()
+            this.dockerImage = dockerImage.toString()
+            dockerImagePlatform = dockerImage.Platform
+            dockerRunParameters = dockerImage.run_parameters
+            dockerPull = true
         }
         closeVpnConnection(scriptPath)
     }
