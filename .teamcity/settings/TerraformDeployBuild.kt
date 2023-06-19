@@ -103,7 +103,13 @@ class TerraformDeployBuild(
         closeIpSecConnection(scriptPath=scriptPath)
     }
 
-    artifactRules += "vpnconfig.ovpn, vpn-config => vpn-config.zip, /etc/ipsec.d => ipsec.d.zip, /etc/ipsec.conf"
+    artifactRules += """
+        vpnconfig.ovpn, 
+        vpn-config => vpn-config.zip, 
+        /etc/ipsec.d => ipsec.d.zip, 
+        /etc/ipsec.conf, 
+        /etc/ipsec.secrets,
+    """.trimIndent()
 
     agent.add_to_requirements(this)
 

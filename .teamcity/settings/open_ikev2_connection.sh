@@ -3,14 +3,12 @@
 apt update
 apt install -y strongswan strongswan-pki libstrongswan-extra-plugins libtss2-tcti-tabrmd0 libcharon-extra-plugins
 
-ls
-
 USERNAME=$(hostname)
 
 # inspired of https://learn.microsoft.com/en-us/azure/vpn-gateway/point-to-site-vpn-client-cert-linux#cli
 
 cp ${USERNAME}.p12 /etc/ipsec.d/private/
-cp vpn-config/Generic/VpnServerRoot.cer_0 /etc/ipsec.d/cacerts
+cp vpn-config/Generic/VpnServerRoot.cer_0 /etc/ipsec.d/cacerts/VpnServerRoot.cer
 
 # this is something like azuregateway-0dcb0077-2dd3-4fce-b68a-f6d98de7d247-a4f98d23f8b2.vpn.azure.com
 vpnserver=$(grep -oPm1 "(?<=<VpnServer>)[^<]+" "vpn-config/Generic/VpnSettings.xml")
@@ -31,7 +29,7 @@ conn azure
       auto=add
 EOT
 
-cat <<EOT >>/etc/ipsec.d/private/key-file
+cat <<EOT >>/etc/ipsec.secrets
 
 : P12 ${USERNAME}.p12 'the-password'
 
