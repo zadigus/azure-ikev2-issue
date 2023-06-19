@@ -51,6 +51,7 @@ project {
         param("env.TF_VAR_location", "eastus")
         param("env.TF_VAR_hub_vnet", "10.60.32.0/20")
         param("env.TF_VAR_vpn_client_address_pools", "10.60.56.0/24")
+        param("env.PIP_EXTRA_INDEX_URL", "%system.pypi-public.server.address.login%")
     }
 
     template(ArtifactoryDockerLogin)
