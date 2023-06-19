@@ -1,7 +1,6 @@
 package settings
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
-import shared.azure.build_steps.publishAzureResourceData
 import shared.common.Agent
 import shared.common.Architecture
 import shared.common.DockerImage
@@ -27,7 +26,7 @@ class TerraformDestroyBuild(
     steps {
         publishJiraProjectId(scriptPath)
         publishTerraformVariables(scriptPath)
-        publishAzureResourceData(scriptPath, dockerImage)
+        publishResourceData(dockerImage, stateKey = "%terraform.state.key%")
         terraformConfig(scriptPath, dockerImage, deploymentWorkingDirectory)
         pullTerraformState(scriptPath, dockerImage, deploymentWorkingDirectory)
         terraformDestroy(scriptPath, dockerImage, deploymentWorkingDirectory)
