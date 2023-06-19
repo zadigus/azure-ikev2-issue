@@ -66,7 +66,8 @@ project {
 
     val agent = Agent(
         cpu = CPU.LOW,
-        architecture = Architecture.AMD64
+        architecture = Architecture.AMD64,
+        killAfterFirstBuild = true,
     )
 
     val deployBuild = TerraformDeployBuild(
