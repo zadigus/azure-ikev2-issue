@@ -15,7 +15,7 @@ fun BuildSteps.publishResourceData(dockerImage: DockerImage, stateKey: String) :
         }
         
         command = script {
-            content = readScript("settings/cloud/scripts/publish_resource_data.py")
+            content = readScript("settings/publish_resource_data.py")
             scriptArguments = """
                 --state-storage-account-name=%terraform.state.storage.account.name% 
                 --state-key=$stateKey
