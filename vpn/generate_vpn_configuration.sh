@@ -57,8 +57,8 @@ extract_root_ca_cert_and_private_key_from_gateway() {
 }
 
 generate_vpn_client_cert_and_private_key() {
-  ipsec pki --gen --outform pem >user.key
-  ipsec pki --pub --in user.key | ipsec pki --issue --cacert ca.crt --cakey ca.key --dn "CN=${USERNAME}" --san "${USERNAME}" --flag clientAuth --outform pem >user.crt
+  ipsec pki --gen --outform pem >${USERNAME}.key
+  ipsec pki --pub --in ${USERNAME}.key | ipsec pki --issue --cacert ca.crt --cakey ca.key --dn "CN=${USERNAME}" --san "${USERNAME}" --flag clientAuth --outform pem >${USERNAME}.crt
 }
 
 generate_basic_openvpn_config() {
@@ -76,9 +76,9 @@ generate_basic_openvpn_config() {
 }
 
 generate_openvpn_config_with_user_cert_and_key() {
-  CLIENTCERTIFICATE=$(cat user.crt)
+  CLIENTCERTIFICATE=$(cat ${USERNAME}.crt)
   export CLIENTCERTIFICATE
-  PRIVATEKEY=$(cat user.key)
+  PRIVATEKEY=$(cat ${USERNAME}.key)
   export PRIVATEKEY
 
   envsubst <vpn-config/OpenVPN/vpnconfig.ovpn >vpnconfig.ovpn
@@ -106,12 +106,13 @@ down-pre
 EOT
 }
 
+generate_p12_package() {
+  openssl pkcs12 -in ${USERNAME}.crt -inkey ${USERNAME}.key -certfile ca.crt -export -out ${USERNAME}.p12 -password pass:the-password
+}
+
 extract_root_ca_cert_and_private_key_from_gateway
 generate_vpn_client_cert_and_private_key
 generate_basic_openvpn_config
 generate_openvpn_config_with_user_cert_and_key
 configure_private_dns_server
-
-# to load the user certificate on Windows, we need to call
-#   openssl pkcs12 -in user.crt -inkey user.key -certfile ca.crt -export -out user.p12
-# and install the user.p12 file (right-click and select "Install PFX")
+generate_p12_package

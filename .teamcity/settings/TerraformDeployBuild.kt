@@ -29,6 +29,12 @@ class TerraformDeployBuild(
         ArtifactoryDockerLogin,
     )
 
+    val azureDockerImage = DockerImage(
+        name = "kubernetes-configuration-x86_64-ubuntu22.04",
+        tag = dockerImageTag,
+        run_parameters = "-v /var/run/docker.sock:/var/run/docker.sock --network host"
+    )
+
     name = "Deploy terraform"
 
     steps {
@@ -57,17 +63,47 @@ class TerraformDeployBuild(
             scriptContent = """
                 #! /bin/sh
                 
+                az login --service-principal -u ${'$'}ARM_CLIENT_ID -p ${'$'}ARM_CLIENT_SECRET --tenant ${'$'}ARM_TENANT_ID
+                
                 credential=${'$'}(az acr credential show --name ${'$'}ACR_NAME --resource-group ${'$'}HUB_RESOURCE_GROUP_NAME)
                 username=${'$'}(echo ${'$'}credential | jq -r '.username')
                 echo ${'$'}credential | jq -r '.passwords[] | select(.name == "password") | .value' | docker login ${'$'}ACR_URL --username ${'$'}username --password-stdin
             """.trimIndent()
-            this.dockerImage = dockerImage.toString()
-            dockerImagePlatform = dockerImage.Platform
-            dockerRunParameters = dockerImage.run_parameters
+            this.dockerImage = azureDockerImage.toString()
+            dockerImagePlatform = azureDockerImage.Platform
+            dockerRunParameters = azureDockerImage.run_parameters
             dockerPull = true
         }
         closeVpnConnection(scriptPath)
+        openIpSecConnection(scriptPath=scriptPath, workingDir="./")
+        script {
+            name = "Ping ACR"
+            scriptContent = """
+                #! /bin/sh
+                
+                nslookup ${'$'}{ACR_URL}
+            """.trimIndent()
+        }
+        script {
+            name = "Log on ACR"
+            scriptContent = """
+                #! /bin/sh
+                
+                az login --service-principal -u ${'$'}ARM_CLIENT_ID -p ${'$'}ARM_CLIENT_SECRET --tenant ${'$'}ARM_TENANT_ID
+                
+                credential=${'$'}(az acr credential show --name ${'$'}ACR_NAME --resource-group ${'$'}HUB_RESOURCE_GROUP_NAME)
+                username=${'$'}(echo ${'$'}credential | jq -r '.username')
+                echo ${'$'}credential | jq -r '.passwords[] | select(.name == "password") | .value' | docker login ${'$'}ACR_URL --username ${'$'}username --password-stdin
+            """.trimIndent()
+            this.dockerImage = azureDockerImage.toString()
+            dockerImagePlatform = azureDockerImage.Platform
+            dockerRunParameters = azureDockerImage.run_parameters
+            dockerPull = true
+        }
+        closeIpSecConnection(scriptPath=scriptPath)
     }
+
+    artifactRules += "vpnconfig.ovpn, vpn-config, /etc/ipsec.d, /etc/ipsec.conf"
 
     agent.add_to_requirements(this)
 
