@@ -1,5 +1,6 @@
 package settings
 
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import shared.common.Agent
@@ -76,6 +77,24 @@ class TerraformDeployBuild(
         }
         closeVpnConnection(scriptPath)
         openIpSecConnection(scriptPath=scriptPath, workingDir="./")
+        script {
+            name = "Debug IPSec"
+            scriptContent = """
+                #! /bin/sh
+                
+                ################################################################
+                # JOURNAL CTL
+                ################################################################
+                journalctl -u ipsec
+                
+                ################################################################
+                # SYSLOGS
+                ################################################################
+                tail -f /var/log/syslog
+                
+            """.trimIndent()
+            executionMode = BuildStep.ExecutionMode.ALWAYS
+        }
         script {
             name = "Ping ACR"
             scriptContent = """

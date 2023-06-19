@@ -10,7 +10,6 @@ USERNAME=$(hostname)
 cp ${USERNAME}.p12 /etc/ipsec.d/private/
 cp vpn-config/Generic/VpnServerRoot.cer_0 /etc/ipsec.d/cacerts/VpnServerRoot.cer
 
-# this is something like azuregateway-0dcb0077-2dd3-4fce-b68a-f6d98de7d247-a4f98d23f8b2.vpn.azure.com
 vpnserver=$(grep -oPm1 "(?<=<VpnServer>)[^<]+" "vpn-config/Generic/VpnSettings.xml")
 
 cat <<EOT >>/etc/ipsec.conf
@@ -27,6 +26,8 @@ conn azure
       rightsubnet=0.0.0.0/0
       leftsourceip=%config
       auto=add
+      ike=aes256-sha256-ecp384
+      esp=aes256-sha256-ecp384
 EOT
 
 cat <<EOT >>/etc/ipsec.secrets
