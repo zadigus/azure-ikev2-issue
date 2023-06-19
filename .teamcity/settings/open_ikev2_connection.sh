@@ -3,6 +3,8 @@
 apt update
 apt install -y strongswan strongswan-pki libstrongswan-extra-plugins libtss2-tcti-tabrmd0 libcharon-extra-plugins
 
+ls
+
 USERNAME=$(hostname)
 
 # inspired of https://learn.microsoft.com/en-us/azure/vpn-gateway/point-to-site-vpn-client-cert-linux#cli
